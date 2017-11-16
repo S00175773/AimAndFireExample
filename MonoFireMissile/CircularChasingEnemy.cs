@@ -26,7 +26,7 @@ namespace AnimatedSprite
         // folow a player if the player comes in the kill zone
         public void follow(PlayerWithWeapon p)
         {
-            if (inChaseZone(p) )
+            if (inChaseZone(p))
             {
                 Vector2 direction = p.position - this.position;
                 direction.Normalize();                

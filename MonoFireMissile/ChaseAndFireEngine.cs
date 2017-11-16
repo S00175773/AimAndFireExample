@@ -10,12 +10,15 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using AnimatedSprite;
 using Utilities;
+using Health;
 
 namespace Engines
 {
     class ChaseAndFireEngine
     {
         PlayerWithWeapon p;
+        Sentry s;
+        HealthBar h;
         SpriteBatch spriteBatch;
         private CircularChasingEnemy[] chasers;
         private Game _gameOwnedBy;
@@ -38,6 +41,15 @@ namespace Engines
                                         new Sprite(game, game.Content.Load<Texture2D>(@"Textures/explosion_strip8"), p.position, 8)
                                         , p.position, 4));
 
+            s = new Sentry(game, game.Content.Load<Texture2D>(@"Textures/turret"), new Vector2(200,200), 1);
+
+            s.loadProjectile(new Projectile(game, game.Content.Load<Texture2D>(@"Textures/fireball_strip4"),
+               new Sprite(game, game.Content.Load<Texture2D>(@"Textures/explosion_strip8"), s.position, 8),
+               s.position, 4));
+
+            h = new HealthBar(game.GraphicsDevice, p.position.ToPoint());
+            
+
             chasers = new CircularChasingEnemy[Utility.NextRandom(2,5)];
 
             for (int i = 0; i < chasers.Count(); i++)
@@ -56,14 +68,41 @@ namespace Engines
 
         public void Update(GameTime gameTime)
         {
+            if(p.alive)
+            {
+                p.Update(gameTime);
+            }
             
-            p.Update(gameTime);
+            s.Update(gameTime);
             foreach (CircularChasingEnemy chaser in chasers)
             {
                 if (p.MyProjectile.ProjectileState == Projectile.PROJECTILE_STATE.EXPOLODING && p.MyProjectile.collisionDetect(chaser))
                     chaser.die();
                 chaser.follow(p);
                 chaser.Update(gameTime);
+            }
+
+            if(h.health <= 0)
+            {
+                p.die();
+            }
+
+            if(s.sentryProjectile.ProjectileState == Projectile.PROJECTILE_STATE.EXPOLODING && s.sentryProjectile.collisionDetect(p))
+            {
+                if(!s.sentryProjectile.hit)
+                h.update(p.position.ToPoint(), h.health - 20);
+                s.sentryProjectile.hit = true;
+            } else
+            {
+                h.update(p.position.ToPoint(), h.health);
+            }
+
+            if(s.inChaseZone(p))
+            {
+                s.follow(p);
+            } else
+            {
+                s.unfollow(p);
             }
             
             
@@ -76,9 +115,14 @@ namespace Engines
         public void Draw(GameTime gameTime)
         {
             p.Draw(spriteBatch);
+            s.Draw(spriteBatch);
+            h.Draw(spriteBatch);
             foreach (CircularChasingEnemy chaser in chasers)
+            {
                 chaser.Draw(spriteBatch);
+            }
         }
+        
 
 
         

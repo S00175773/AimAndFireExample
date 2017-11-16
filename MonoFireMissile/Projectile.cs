@@ -22,9 +22,10 @@ namespace AnimatedSprite
             float ExplosionTimer = 0;
             float ExplosionVisibleLimit = 1000;
             Vector2 StartPosition;
-           
+        public bool hit = false;
 
-            public PROJECTILE_STATE ProjectileState
+
+        public PROJECTILE_STATE ProjectileState
             {
                 get { return projectileState; }
                 set { projectileState = value; }

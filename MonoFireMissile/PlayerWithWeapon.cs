@@ -15,6 +15,7 @@ namespace AnimatedSprite
             protected float playerVelocity = 6.0f;
         private Projectile myProjectile;
         protected CrossHair Site;
+        public bool alive = true;
 
             public Vector2 CentrePos
             {
@@ -47,6 +48,11 @@ namespace AnimatedSprite
                 MyProjectile = r;
             }
 
+        public void die()
+        {
+            alive = false;
+        }
+
 
         public override void Update(GameTime gameTime)
         {
@@ -75,7 +81,7 @@ namespace AnimatedSprite
             if (MyProjectile != null && MyProjectile.ProjectileState == Projectile.PROJECTILE_STATE.STILL)
                 MyProjectile.position = this.CentrePos;
             // if a roecket is loaded
-            if (MyProjectile != null)
+            if (MyProjectile != null && myProjectile.ProjectileState == Projectile.PROJECTILE_STATE.STILL)
             {
                 // fire the rocket and it looks for the target
                 if(Keyboard.GetState().IsKeyDown(Keys.Space))
@@ -93,6 +99,7 @@ namespace AnimatedSprite
             
             if (MyProjectile != null)
                 MyProjectile.Update(gameTime);
+
             // Update the players site
             Site.Update(gameTime);
             // call Sprite Update to get it to animated 
@@ -101,11 +108,15 @@ namespace AnimatedSprite
             
         public override void Draw(SpriteBatch spriteBatch)
         {
-            base.Draw(spriteBatch);
-            Site.Draw(spriteBatch);
+            if (alive)
+            {
+                base.Draw(spriteBatch);
+                Site.Draw(spriteBatch);
+            }
+
             if (MyProjectile != null && MyProjectile.ProjectileState != Projectile.PROJECTILE_STATE.STILL)
-                    MyProjectile.Draw(spriteBatch);
-            
+                MyProjectile.Draw(spriteBatch);
+
         }
 
     }
